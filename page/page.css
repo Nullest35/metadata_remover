@@ -1,0 +1,15 @@
+main{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+#the-file-preview{
+  width: 250px;
+  max-height: 250px;
+}
+
+.metadata-container{
+  width:400px;
+}
