@@ -1,13 +1,20 @@
 function getChunkType(byteArray, pointer) {
-  return(String.fromCharCode(byteArray[pointer + 4], byteArray[pointer + 5], byteArray[pointer + 6], byteArray[pointer + 7]));
+  return((byteArray[pointer] << 8) | byteArray[pointer + 1]);
 }
 
 function getChunkSize(byteArray, pointer) {
-  return getChunkLength(byteArray, pointer) + 4 * 3;
+  return getChunkLength(byteArray, pointer) + 2;
 }
 
 function getChunkLength(byteArray, pointer) {
-  return (Math.pow(2, 8 * 3) * byteArray[pointer] + Math.pow(2, 8 * 2) * byteArray[pointer + 1] + Math.pow(2, 8) * byteArray[pointer + 2] + byteArray[pointer + 3]);
+  const zeroLengthChunks = [0xFFD8, 0xFFD9, 0xFF01, 0xFFD0, 0xFFD1, 0xFFD2, 0xFFD3, 0xFFD4, 0xFFD5, 0xFFD6, 0xFFD7];
+  
+  if (zeroLengthChunks.includes(getChunkType(byteArray, pointer))) {
+    return 0;
+  }
+  else {
+    return ((byteArray[pointer + 2] << 8) | byteArray[pointer + 3]);
+  }
 }
 
 function nextChunk(byteArray, pointer) {
@@ -16,9 +23,9 @@ function nextChunk(byteArray, pointer) {
 
 function readChunkData(byteArray, pointer) {
   let str = "";
-  // chunk length (actual data) starts 8 bytes after the chunk pointer
+  // chunk length (actual data) starts 2 bytes after the chunk pointer
   const length = getChunkLength(byteArray, pointer);
-  pointer = pointer + 8;
+  pointer = pointer + 2;
   
   for (let i = 0; i < length; i++) {
     let byte = byteArray[pointer + i];
